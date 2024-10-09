@@ -1,0 +1,80 @@
+@import url('https://fonts.googleapis.com/css2?family=Bangers&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@600&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    background-color: #f2622d;
+}
+
+.logo {
+    font-size: 50px;
+    text-decoration: none;
+    font-family: 'Bangers', cursive;
+    color: white;
+}
+
+header button {
+    transition: all 0.3s ease 0s;
+    font-family: 'Nunito Sans', sans-serif;
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    background-color: rgb(28, 180, 180);
+}
+
+header button:hover {
+    transition: all 0.3s ease 0s;
+    background-color: rgb(33, 206, 206);
+}
+
+header button a {
+    text-decoration: none;
+    color: white;
+    font-size: 20px;
+}
+
+.banner {
+    width: 100%;
+    object-fit: cover;
+}
+
+.content {
+    margin-top: -5px;
+}
+
+.content h1 {
+    margin: 0;
+    font-family: 'Bangers', cursive;
+    color: white;
+    background-color: black;
+    text-align: center;
+    font-size: 45px;
+    padding: 20px 0px;
+ }
+
+.content p {
+    margin: 20px 40px;
+    font-size: 30px;
+    font-family: 'Nunito Sans', sans-serif;
+    text-align: justify;
+}
+
+footer {
+    background-color: #f2622d;
+    font-family: 'Nunito Sans', sans-serif;
+    text-align: center;
+    font-size: 25px;
+    color: white;
+    padding: 8px 10px;
+}
+
