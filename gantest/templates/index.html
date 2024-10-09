@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokemon Price Predictor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Pokemon Price Predictor</h1>
+        <button id="backButton" onclick="window.location.href='/'">Back</button>
+        <select id="cardSelect">
+            <option value="hgss4-1">Aggron</option>
+            <option value="xy5-1">Weedle</option>
+            <option value="pl1-1">Ampharos</option>
+            <option value="dp3-1">Ampharos (DP)</option>
+            <option value="det1-1">Bulbasaur</option>
+            <option value="dv1-1">Dratini</option>
+        </select>
+        <button id="predictButton">Predict Price</button>
+        <canvas id="priceChart" width="400" height="200"></canvas>
+    </div>
+
+    <script>
+        document.getElementById('predictButton').addEventListener('click', function() {
+            const cardId = document.getElementById('cardSelect').value;
+            fetch(`/predict/${cardId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const ctx = document.getElementById('priceChart').getContext('2d');
+                    const days = Array.from({ length: 30 }, (v, k) => k + 1);
+                    
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: days,
+                            datasets: [{
+                                label: 'Predicted Prices for Next 30 Days',
+                                data: data,
+                                borderColor: 'rgba(75, 192, 192, 1)',
+                                borderWidth: 1,
+                                fill: false
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                    beginAtZero: false
+                                }
+                            }
+                        }
+                    });
+                });
+        });
+    </script>
+</body>
+</html>

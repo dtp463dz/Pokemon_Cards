@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Price Prediction with Chart.js</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <canvas id="myChart" width="400" height="100"></canvas>
+    <script>
+        async function fetchPrediction(days) {
+            const response = await fetch('http://127.0.0.1:5000/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ days: days })
+            });
+            return response.json();
+        }
+
+        async function renderChart() {
+            const days = Array.from({ length: 30 }, (_, i) => i + 1); // Dự đoán cho 30 ngày tiếp theo
+            const prediction = await fetchPrediction(days);
+
+            const ctx = document.getElementById('myChart').getContext('2d');
+            const chart = new Chart(ctx, {
+                type: 'line', // Hoặc 'bar', 'pie', v.v.
+                data: {
+                    labels: days.map(d => `Ngày ${d}`),
+                    datasets: [{
+                        label: 'Giá Dự Đoán',
+                        data: prediction.predictions,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 2,
+                        fill: false
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        renderChart();
+    </script>
+</body>
+</html>

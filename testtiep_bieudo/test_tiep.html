@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokemon Card Price Prediction</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div style="width: 600px;">
+        <canvas id="predictionChart"></canvas>
+    </div>
+
+    <script>
+        // Gọi API dự đoán giá
+        async function fetchPredictedPrices() {
+            const response = await fetch('http://127.0.0.1:5000/api/predict_price');
+            const data = await response.json();
+            return data;
+        }
+
+        // Hiển thị biểu đồ dự đoán giá
+        fetchPredictedPrices().then(predictionData => {
+            const ctx = document.getElementById('predictionChart').getContext('2d');
+
+            const data = {
+                labels: predictionData.dates,  // Ngày dự đoán
+                datasets: [{
+                    label: 'Predicted Market Price (USD)',
+                    data: predictionData.predicted_prices,  // Giá trị dự đoán
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }]
+            };
+
+            const config = {
+                type: 'line',  // Biểu đồ đường
+                data: data,
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Price (USD)'
+                            }
+                        }
+                    }
+                }
+            };
+
+            const predictionChart = new Chart(ctx, config);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!-- card-details.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokemon Card Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        .card-details {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .card-details img {
+            width: 200px;
+            height: auto;
+        }
+
+        .card-details h2 {
+            margin-top: 10px;
+        }
+
+        .card-details p {
+            margin: 10px 0;
+        }
+
+        .prices {
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card-details" id="card-details">
+        <!-- Thông tin thẻ Pokémon sẽ hiển thị ở đây -->
+    </div>
+
+    <script>
+        class PokemonCard {
+            static baseUrl = "https://api.pokemontcg.io/v2/cards";
+
+            // Lấy thẻ dựa trên ID
+            static getCardById(id) {
+                return fetch(`${this.baseUrl}/${id}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Card not found');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        return data.data; // Trả về thông tin thẻ
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        return null;
+                    });
+            }
+        }
+
+        // Lấy ID thẻ từ URL
+        function getCardIdFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('id');
+        }
+
+        // Hiển thị thông tin chi tiết thẻ Pokémon
+        function displayCardDetails(card) {
+            const cardDetailsDiv = document.getElementById('card-details');
+
+            cardDetailsDiv.innerHTML = `
+                <img src="${card.images.large}" alt="${card.name}">
+                <h2>${card.name}</h2>
+                <p><strong>Set:</strong> ${card.set.name}</p>
+                <p><strong>Type:</strong> ${card.types.join(', ')}</p>
+                <p><strong>HP:</strong> ${card.hp}</p>
+                <div class="prices">
+                    <p><strong>Normal:</strong> $${card.cardmarket?.prices?.averageSellPrice || 'N/A'}</p>
+                    <p><strong>Holofoil:</strong> $${card.tcgplayer?.prices?.holofoil?.market || 'N/A'}</p>
+                    <p><strong>Reverse Holofoil:</strong> $${card.tcgplayer?.prices?.reverseHolofoil?.market || 'N/A'}</p>
+                </div>
+                <p><strong>Artist:</strong> ${card.artist}</p>
+                <p><strong>Rarity:</strong> ${card.rarity}</p>
+            `;
+        }
+
+        // Khi trang được tải
+        const cardId = getCardIdFromUrl();
+        if (cardId) {
+            PokemonCard.getCardById(cardId).then(card => {
+                if (card) {
+                    displayCardDetails(card);
+                } else {
+                    document.getElementById('card-details').innerHTML = '<p>Card not found.</p>';
+                }
+            });
+        } else {
+            document.getElementById('card-details').innerHTML = '<p>Invalid card ID.</p>';
+        }
+    </script>
+
+</body>
+</html>
