@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokemon Cards Gallery</title>
+    <link rel="stylesheet" href="card_show.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <h1>Pokemon Cards Gallery</h1>
+    <!-- Phần tìm kiếm -->
+    <div class="search-container">
+        <input type="text" id="search-input" placeholder="Enter card name or ID" />
+        <button id="search-btn">Search</button>
+        <button id="stats-btn">Thống Kê Giá</button>
+    </div>
+
+    <!-- Phần sắp xếp -->
+    <div class="sort-container">
+        <label for="sort-select">Sort by:</label>
+        <select id="sort-select">
+            <option value="name-asc">Name (A-Z)</option>
+            <option value="price-asc">Price (Low to High)</option>
+            <option value="price-desc">Price (High to Low)</option>
+        </select>
+    </div>
+    <!-- Danh sách các thẻ Pokémon -->
+    <div class="card-grid" id="card-grid"><!-- Thẻ Pokémon sẽ hiển thị ở đây --></div>
+
+    <canvas id="price-chart" width="400" height="200" style="display: none;"></canvas>
+
+    <script>
+        class PokemonCard {
+            static baseUrl = "https://api.pokemontcg.io/v2/cards";
+
+            static getAllCards() {
+                return fetch(`${this.baseUrl}?pageSize=20`)
+                    .then(response => response.json())
+                    .then(data => data.data)
+                    .catch(error => {
+                        console.error('Error:', error);
+                        return null;
+                    });
+            }
+
+            static searchCard(query) {
+                return fetch(`${this.baseUrl}?q=name:${query}* OR id:${query}*`)
+                    .then(response => response.json())
+                    .then(data => data.data)
+                    .catch(error => {
+                        console.error('Error:', error);
+                        return null;
+                    });
+            }
+        }
+
+        // Hàm sắp xếp
+        function sortCards(cards, criteria) {
+            if (criteria === 'name-asc') {
+                return cards.sort((a, b) => a.name.localeCompare(b.name));
+            } else if (criteria === 'price-asc') {
+                return cards.sort((a, b) => {
+                    const priceA = a.tcgplayer?.prices?.holofoil?.market || 0;
+                    const priceB = b.tcgplayer?.prices?.holofoil?.market || 0;
+                    return priceA - priceB;
+                });
+            } else if (criteria === 'price-desc') {
+                return cards.sort((a, b) => {
+                    const priceA = a.tcgplayer?.prices?.holofoil?.market || 0;
+                    const priceB = b.tcgplayer?.prices?.holofoil?.market || 0;
+                    return priceB - priceA;
+                });
+            }
+        }
+
+        function displayCards(cards) {
+            const cardGrid = document.getElementById('card-grid');
+            cardGrid.innerHTML = '';
+
+            cards.forEach(card => {
+                const cardElement = document.createElement('div');
+                cardElement.classList.add('card');
+
+                cardElement.innerHTML = `
+                    <a href="card-details.html?id=${card.id}">
+                        <img src="${card.images.small}" alt="${card.name}">
+                        <p><strong>${card.name}</strong></p>
+                        <p><em>${card.set.name}</em></p>
+                        <p><strong>Rarity:</strong> ${card.rarity}</p>
+                        <div class="prices">
+                            <p><strong>Normal:</strong> $${card.tcgplayer?.prices?.holofoil?.mid || 'N/A'}</p>
+                            <p><strong>Market Price:</strong> $${card.tcgplayer?.prices?.holofoil?.market || 'N/A'}</p>
+                            <p><strong>Reverse Holofoil:</strong> $${card.tcgplayer?.prices?.reverseHolofoil?.market || 'N/A'}</p>
+                        </div>
+                    </a>
+                `;
+
+                cardGrid.appendChild(cardElement);
+            });
+        }
+
+        function displayPriceChart(cards) {
+            const cardNames = cards.map(card => card.name);
+            const cardPrices = cards.map(card => card.tcgplayer?.prices?.holofoil?.market || 0);
+
+            // Chuyển đến trang mới với dữ liệu giá
+            const url = `chartest.html?names=${encodeURIComponent(JSON.stringify(cardNames))}&prices=${encodeURIComponent(JSON.stringify(cardPrices))}`;
+            window.location.href = url;
+        }
+
+        let allCards = [];
+        PokemonCard.getAllCards().then(cards => {
+            if (cards) {
+                allCards = cards;
+                displayCards(allCards);
+            }
+        });
+
+        document.getElementById('search-btn').addEventListener('click', () => {
+            const query = document.getElementById('search-input').value.trim();
+            if (query) {
+                PokemonCard.searchCard(query).then(cards => {
+                    if (cards) {
+                        allCards = cards;
+                        displayCards(allCards);
+                    } else {
+                        document.getElementById('card-grid').innerHTML = '<p>No cards found.</p>';
+                    }
+                });
+            }
+        });
+
+        document.getElementById('stats-btn').addEventListener('click', () => {
+            if (allCards.length > 0) {
+                displayPriceChart(allCards);
+            } else {
+                alert('Không có thẻ nào để thống kê.');
+            }
+        });
+        // Khi thay đổi lựa chọn sắp xếp
+        document.getElementById('sort-select').addEventListener('change', (event) => {
+            const sortedCards = sortCards(allCards, event.target.value);
+            displayCards(sortedCards);
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thống Kê Giá Thẻ Pokémon</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        canvas {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Thống Kê Giá Thẻ Pokémon</h1>
+    <canvas id="price-chart" width="400" height="200"></canvas>
+    <button id="back-btn">Quay lại</button>
+
+    <script>
+        // Lấy dữ liệu từ URL
+        const params = new URLSearchParams(window.location.search);
+        const cardNames = JSON.parse(params.get('names'));
+        const cardPrices = JSON.parse(params.get('prices'));
+
+        // Tạo biểu đồ
+        const ctx = document.getElementById('price-chart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: cardNames,
+                datasets: [{
+                    label: 'Giá trung bình (USD)',
+                    data: cardPrices,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Quay lại trang trước
+        document.getElementById('back-btn').addEventListener('click', () => {
+            window.history.back();
+        });
+    </script>
+
+</body>
+</html>
