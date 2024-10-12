@@ -19,6 +19,11 @@ h1{
     letter-spacing: 5px;
 }
 
+h2 a{
+    text-decoration-line: none;
+    
+}
+
 .pokeContainer{
     display: flex;
     flex-wrap: wrap;
