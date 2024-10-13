@@ -52,6 +52,21 @@
             vertical-align: middle; /* Align with text */
             margin-right: 5px;
         }
+
+        .predict-button {
+            background-color: #4CAF50; /* Màu xanh lá */
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        .predict-button:hover {
+            background-color: #45a049; /* Màu khi rê chuột */
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -64,7 +79,9 @@
     <div class="card-details" id="card-details">
         <!-- Thông tin thẻ Pokémon sẽ hiển thị ở đây -->
         <canvas id="priceChart" width="400" height="200"></canvas>
+        
     </div>
+    <button id="predict-button" class="predict-button">Dự đoán giá tương lai</button>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -203,6 +220,23 @@
     } else {
         document.getElementById('card-details').innerHTML = '<p>Invalid card ID.</p>';
     }
+
+    // Hàm điều hướng sang trang Streamlit với ID thẻ
+    function redirectToStreamlit(cardId) {
+        const streamlitUrl = `http://localhost:8501/?id=${cardId}`;  // Đường dẫn đến ứng dụng Streamlit
+        window.location.href = streamlitUrl;  // Điều hướng đến URL của Streamlit
+    }
+
+    // Gắn sự kiện click vào nút "Dự đoán"
+    document.getElementById('predict-button').addEventListener('click', function() {
+        const cardId = getCardIdFromUrl();  // Lấy ID của thẻ hiện tại
+        if (cardId) {
+            redirectToStreamlit(cardId);  // Điều hướng nếu có ID thẻ
+        } else {
+            alert('Không tìm thấy ID thẻ!');
+        }
+    });
+
 </script>
 
     
